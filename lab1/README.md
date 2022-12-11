@@ -1,1 +1,3 @@
 # networks
+##Схема
+![](schema.png)

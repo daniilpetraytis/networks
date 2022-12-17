@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import time
 
 
 def check_mtu(host, mtu):

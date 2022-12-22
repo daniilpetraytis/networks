@@ -12,6 +12,13 @@ def check_mtu(host, mtu):
 def main(argv):
     if len(argv) < 2:
         raise "too many args"
+    process = subprocess.run(
+        ["cat", "/proc/sys/net/ipv4/icmp_echo_ignore_all"],
+        capture_output=True,
+        text=True
+    )
+    if process.stdout == 1:
+        raise "icmp is disabled"
 
     host = argv[1]
     l = 1
@@ -19,13 +26,15 @@ def main(argv):
 
     while r - l > 1:
         mtu = (l + r) // 2
-        if check_mtu(host, str(mtu)):
+        checker = check_mtu(host, str(mtu))
+        if checker.returncode == 0:
             l = mtu
-        else:
+        elif checker.returncode == 1:
             r = mtu
-        time.sleep(1)
+        else:
+            raise checker.stderr
 
-    print(f"MTU is {l}")
+    print(f"MTU is {l + 28}")
 
 
 if __name__ == '__main__':
